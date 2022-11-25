@@ -66,6 +66,7 @@ router.get("/", async (req, res, next) => {
             <html>
                 <head>
                 <title>Movie List</title>
+                <link rel="stylesheet" type="text/css" href="/base-styling.css" />
                 <link rel="stylesheet" type="text/css" href="/movie-list-style.css" />
                 
                 </head>
@@ -73,21 +74,24 @@ router.get("/", async (req, res, next) => {
                     <h1>Movie List</h1>
                     <nav>
                         <a href="/movies?unwatched=1">Only Unwatched</a>
+                        <a href="/movies/feeling-lucky">I'm Feeling Lucky</a>
+                        <a href="/movies/add-movie">Add to Watchlist</a>
+
                     </nav>
-                    <ul>
+                    <ul id="list-of-movies">
                         ${movies.map((movie) => {
                 return `
                     <li class="${movie.watched === true ? "watched" : ""}">
-                    <h2>${movie.title}</h2>
-                    ${movie.imdbLink ? `<a target="_blank" href="${movie.imdbLink}">IMBD</a>` : ""}
+                    <h2>${movie.title} ${movie.imdbLink ? `<a target="_blank" href="${movie.imdbLink}">IMBD</a>` : ""}</h2>
+                    
                                         
-                    <ul>
+                    <ul class="genres-list">
                     ${movie.genres.map(genre => {
                     return `<li><a href="/movies?genre=${genre.name}">${genre.name}</li>`;
 
                 }).join("")}
                  </ul>
-                ${movie.watched === false ? `<a href="/movies/${movie.id}/mark-watched">I seen this!</a>` : ""}
+                ${movie.watched === false ? `<a class="watch-link" href="/movies/${movie.id}/mark-watched">I seen this!</a>` : ""}
                 </li>
             `
             }).join("")}
@@ -102,7 +106,37 @@ router.get("/", async (req, res, next) => {
 
 });
 
-router.get("/:movieId/mark-watched", async (req, res, next) => {
+router.get("/feeling-lucky", async (req, res, next) => {
+    try{
+        const allUnwatchedMovies = await Movie.findAll({
+            where: {
+                watched: false
+            }
+        });
+        const amountOfUnwatchedMovies = allUnwatchedMovies.length;
+        const randomNumber = Math.floor(Math.random() * amountOfUnwatchedMovies);
+        const chosenMovie = allUnwatchedMovies[randomNumber];
+        res.send(`
+            <!DOCTYPE html>
+            <html>
+                <head>
+                <title>Your Chosen Movie</title>
+                <link rel="stylesheet" type="text/css" href="/base-styling.css" />
+                </head>
+                <body>
+                    <h1>You should watch: ${chosenMovie.title}</h1>
+                    <a href="/movies">Back to List</a>
+                    <a href="/movies/feeling-lucky">Try Again</a>
+                </body>
+            </html>
+        `)
+    } catch (e) {
+        next(e);
+
+    }
+});
+
+router.get("/movies/mark-watched", async (req, res, next) => {
     const id = req.params.movieId;
 
     try {
@@ -135,6 +169,7 @@ router.get("/add-movie", async (req, res) => {
                             <meta http-equiv="X-UA-Compatible" content="IE=edge">
                                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                                     <title>Add a movie to your watchlist</title>
+                                    <link rel="stylesheet" type="text/css" href="/base-styling.css" />
                                 </head>
                                 <body>
                                     <h1>Add Movie 🎥 </h1>

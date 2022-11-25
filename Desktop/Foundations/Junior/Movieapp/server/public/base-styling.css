@@ -1,0 +1,29 @@
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    padding: 0;
+    margin: 0;
+    background: aquamarine;
+}
+
+body {
+    padding-left: 50px;
+}
+
+a {
+    font-weight: bold;
+    color: black
+}
+
+a:visited {
+    font-weight: light;
+    color: green
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
